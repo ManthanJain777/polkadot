@@ -10,7 +10,7 @@ export function AboutPage() {
     },
     {
       icon: Globe,
-      title: 'IPFS Storage',
+      title: 'Polkadot Blockchain',
       description: 'InterPlanetary File System - a distributed, peer-to-peer protocol for storing and sharing data in a decentralized manner.',
     },
     {
@@ -55,7 +55,7 @@ export function AboutPage() {
       
       <div className="container mx-auto px-4 py-16 max-w-6xl relative z-10">
         <div className="text-center mb-16">
-          <h1 className="text-foreground mb-6 text-5xl uppercase font-black tracking-tight">About IPFS File Hasher</h1>
+          <h1 className="text-foreground mb-6 text-5xl uppercase font-black tracking-tight">About Polkadot File Verifier</h1>
           <p className="text-muted-foreground max-w-3xl mx-auto text-lg">
             A decentralized application that combines blockchain technology, cryptographic hashing, 
             and distributed storage to provide secure file verification and ownership proof.
@@ -68,12 +68,12 @@ export function AboutPage() {
           <h2 className="text-card-foreground mb-6 text-3xl uppercase font-black tracking-wide relative z-10">Our Mission</h2>
           <p className="text-card-foreground/70 mb-6 text-lg relative z-10">
             In an era of deepfakes, digital manipulation, and content theft, proving the authenticity 
-            and ownership of digital files has never been more critical. IPFS File Hasher provides a 
+            and ownership of digital files has never been more critical. Polkadot File Verifier provides a 
             trustless, decentralized solution for verifying file integrity and establishing proof of 
             ownership through blockchain technology.
           </p>
           <p className="text-card-foreground/70 text-lg relative z-10">
-            By combining SHA256 cryptographic hashing, IPFS distributed storage, and blockchain 
+            By combining SHA256 cryptographic hashing and Polkadot blockchain technology, 
             immutability, we enable users to create unforgeable records of their digital assets with 
             timestamp and geolocation metadata.
           </p>
@@ -149,7 +149,7 @@ export function AboutPage() {
             </li>
             <li className="flex gap-2 items-start">
               <span className="text-[#FB923C] text-xl flex-shrink-0">•</span>
-              <span>Integrate with IPFS nodes for real file storage</span>
+              <span>Integrate with Polkadot parachains for enhanced functionality</span>
             </li>
             <li className="flex gap-2 items-start">
               <span className="text-[#FB923C] text-xl flex-shrink-0">•</span>

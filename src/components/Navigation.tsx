@@ -1,4 +1,4 @@
-import { Home, Upload, Search, Info } from 'lucide-react';
+import { Home, Upload, Search, Info, Award, Activity } from 'lucide-react';
 import { Logo } from './Logo';
 
 interface NavigationProps {
@@ -9,7 +9,9 @@ interface NavigationProps {
 export function Navigation({ currentPage, onPageChange }: NavigationProps) {
   const navItems = [
     { id: 'home', label: 'Home', icon: Home },
-    { id: 'upload', label: 'Upload', icon: Upload },
+    { id: 'upload', label: 'File Upload', icon: Upload },
+    { id: 'certificate', label: 'Certificate', icon: Award },
+    { id: 'transactions', label: 'Transactions', icon: Activity },
     { id: 'verify', label: 'Verify', icon: Search },
     { id: 'about', label: 'About', icon: Info },
   ];
@@ -24,7 +26,7 @@ export function Navigation({ currentPage, onPageChange }: NavigationProps) {
           >
             <Logo size={48} />
             <div>
-              <h2 className="text-card-foreground uppercase tracking-wide font-bold text-xl group-hover:text-primary transition-colors">IPFS Hasher</h2>
+              <h2 className="text-card-foreground uppercase tracking-wide font-bold text-xl group-hover:text-primary transition-colors">Polkadot Verifier</h2>
             </div>
           </button>
 

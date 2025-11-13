@@ -5,9 +5,13 @@ import { HomePage } from './pages/HomePage';
 import { UploadPage } from './pages/UploadPage';
 import { VerifyPage } from './pages/VerifyPage';
 import { AboutPage } from './pages/AboutPage';
+import { CertificateUploadPage } from './pages/CertificateUploadPage';
+import { TransactionHistoryPage } from './pages/TransactionHistoryPage';
+import { PolkadotHeader } from './components/PolkadotHeader'; // NEW
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState('home');
+  const [isPolkadotConnected, setIsPolkadotConnected] = useState(false); // NEW
 
   useEffect(() => {
     // Handle initial hash
@@ -28,23 +32,35 @@ export default function App() {
     window.location.hash = page;
   };
 
+  // NEW: Polkadot connection handler
+  const handlePolkadotConnection = (connected: boolean) => {
+    setIsPolkadotConnected(connected);
+  };
+
   const renderPage = () => {
     switch (currentPage) {
       case 'home':
-        return <HomePage onNavigate={handlePageChange} />;
+        return <HomePage onNavigate={handlePageChange} isPolkadotConnected={isPolkadotConnected} />;
       case 'upload':
-        return <UploadPage />;
+        return <UploadPage isPolkadotConnected={isPolkadotConnected} />;
+      case 'certificate':
+        return <CertificateUploadPage isPolkadotConnected={isPolkadotConnected} />;
+      case 'transactions':
+        return <TransactionHistoryPage />;
       case 'verify':
-        return <VerifyPage />;
+        return <VerifyPage isPolkadotConnected={isPolkadotConnected} />;
       case 'about':
         return <AboutPage />;
       default:
-        return <HomePage onNavigate={handlePageChange} />;
+        return <HomePage onNavigate={handlePageChange} isPolkadotConnected={isPolkadotConnected} />;
     }
   };
 
   return (
     <div className="min-h-screen bg-background">
+      {/* NEW: Polkadot Header */}
+      <PolkadotHeader onConnectionChange={handlePolkadotConnection} />
+      
       <Navigation currentPage={currentPage} onPageChange={handlePageChange} />
       <main>
         {renderPage()}
@@ -54,10 +70,10 @@ export default function App() {
         <div className="absolute -top-20 left-1/2 w-60 h-60 bg-[#8B5CF6]/10 rounded-full blur-3xl"></div>
         <div className="container mx-auto px-4 text-center relative z-10">
           <p className="text-card-foreground font-bold uppercase tracking-wide mb-2">
-            IPFS File Hasher &amp; Blockchain Verification System
+            Polkadot File Verifier
           </p>
           <p className="text-card-foreground/60">
-            Powered by SHA256, IPFS, and Blockchain Technology
+            Powered by SHA256 and Polkadot Blockchain Technology
           </p>
         </div>
       </footer>

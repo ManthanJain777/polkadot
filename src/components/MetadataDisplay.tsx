@@ -1,84 +1,77 @@
-import { Card } from './ui/card';
-import { Button } from './ui/button';
-import { Upload, Send, Loader2 } from 'lucide-react';
+import { Shield } from 'lucide-react';
 
+// Define the interface for file data
 interface FileData {
   fileName: string;
   fileHash: string;
-  ipfsCID: string;
   latitude: number;
   longitude: number;
   timestamp: string;
 }
 
 interface MetadataDisplayProps {
-  fileData: FileData | null;
-  onUploadToIPFS: () => void;
-  onSubmitToBlockchain: () => void;
-  walletConnected: boolean;
-  isUploading: boolean;
-  isSubmitting: boolean;
+  fileData: FileData;
+  onSubmitToPolkadot: () => void;
+  isPolkadotConnected: boolean;
+  isSubmittingToPolkadot: boolean;
 }
 
-export function MetadataDisplay({ 
-  fileData, 
-  onUploadToIPFS, 
-  onSubmitToBlockchain,
-  walletConnected,
-  isUploading,
-  isSubmitting
+export function MetadataDisplay({
+  fileData,
+  onSubmitToPolkadot,
+  isPolkadotConnected,
+  isSubmittingToPolkadot
 }: MetadataDisplayProps) {
-  if (!fileData) return null;
-
-  const metadata = {
-    fileHash: fileData.fileHash,
-    ipfsCID: fileData.ipfsCID,
-    timestamp: fileData.timestamp,
-    latitude: fileData.latitude.toFixed(6),
-    longitude: fileData.longitude.toFixed(6),
-    fileName: fileData.fileName,
-  };
-
-  const metadataJSON = JSON.stringify(metadata, null, 2);
-
   return (
-    <Card className="p-8 bg-card border-2 border-border/50 shadow-xl relative overflow-hidden">
-      <div className="absolute -top-10 -right-10 w-40 h-40 bg-[#FB923C]/20 rounded-full blur-2xl"></div>
-      <h3 className="text-card-foreground mb-6 font-bold text-2xl uppercase tracking-wide relative z-10">Data Aggregation Preview</h3>
+    <div className="p-6 bg-card rounded-2xl shadow-lg border border-border">
+      <h3 className="text-card-foreground mb-4 font-bold text-xl">
+        File Verification Ready
+      </h3>
       
-      <div className="mb-8 relative z-10">
-        <pre className="bg-[#0F0F1A] text-[#2DD4BF] p-6 rounded-2xl overflow-x-auto border-2 border-[#2DD4BF]/30 shadow-lg shadow-[#2DD4BF]/10">
-          <code className="text-sm">{metadataJSON}</code>
-        </pre>
+      {/* File Metadata */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div>
+          <p className="text-card-foreground/60 text-sm">File Name</p>
+          <p className="text-card-foreground font-semibold">{fileData.fileName}</p>
+        </div>
+        <div>
+          <p className="text-card-foreground/60 text-sm">SHA-256 Hash</p>
+          <p className="text-card-foreground font-mono text-sm break-all">
+            {fileData.fileHash}
+          </p>
+        </div>
+        <div>
+          <p className="text-card-foreground/60 text-sm">Timestamp</p>
+          <p className="text-card-foreground">
+            {new Date(fileData.timestamp).toLocaleString()}
+          </p>
+        </div>
+        <div>
+          <p className="text-card-foreground/60 text-sm">Location</p>
+          <p className="text-card-foreground">
+            {fileData.latitude.toFixed(6)}, {fileData.longitude.toFixed(6)}
+          </p>
+        </div>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-4 relative z-10">
-        <Button
-          onClick={onUploadToIPFS}
-          disabled={!walletConnected || isUploading || isSubmitting}
-          className="flex-1 bg-secondary hover:bg-secondary/90 text-background py-6 rounded-full font-semibold lowercase shadow-lg shadow-secondary/30 text-lg"
-        >
-          {isUploading ? (
-            <Loader2 className="mr-2 h-6 w-6 animate-spin" />
-          ) : (
-            <Upload size={20} className="mr-2" />
-          )}
-          {isUploading ? 'uploading...' : 'upload to ipfs'}
-        </Button>
-        
-        <Button
-          onClick={onSubmitToBlockchain}
-          disabled={!walletConnected || isUploading || isSubmitting}
-          className="flex-1 bg-primary hover:bg-primary/90 text-white py-6 rounded-full font-semibold lowercase shadow-lg shadow-primary/30 text-lg"
-        >
-          {isSubmitting ? (
-            <Loader2 className="mr-2 h-6 w-6 animate-spin" />
-          ) : (
-            <Send size={20} className="mr-2" />
-          )}
-          {isSubmitting ? 'submitting...' : 'submit to blockchain'}
-        </Button>
-      </div>
-    </Card>
+      {/* POLKADOT ONLY: Submit Button */}
+      <button
+        onClick={onSubmitToPolkadot}
+        disabled={!isPolkadotConnected || isSubmittingToPolkadot}
+        className="w-full bg-gradient-to-r from-[#E6007A] to-[#6F36BC] text-white py-3 px-6 rounded-xl font-semibold hover:opacity-90 disabled:opacity-50 transition-all shadow-lg"
+      >
+        {isSubmittingToPolkadot ? (
+          <>
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+            Verifying on Polkadot...
+          </>
+        ) : (
+          <>
+            <Shield className="w-4 h-4 mr-2" />
+            Verify on Polkadot Blockchain
+          </>
+        )}
+      </button>
+    </div>
   );
 }

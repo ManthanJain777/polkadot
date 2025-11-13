@@ -1,18 +1,18 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Card } from './ui/card';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { CheckCircle, Search, MapPin, Clock, FileText, Hash, AlertTriangle } from 'lucide-react';
-import { ethers } from 'ethers';
-import MediaVerificationABI from '../MediaVerification.json';
+import { MultiChainPolkadotService } from '../services/multiChainPolkadotService';
 
 interface VerificationResult {
   fileHash: string;
   timestamp: string;
-  latitude: string;
-  longitude: string;
-  ipfsCID: string;
+  fileName: string;
+  location: string;
+  status: string;
+  blockNumber: string | number;
 }
 
 export function VerificationModule() {
@@ -20,35 +20,10 @@ export function VerificationModule() {
   const [verificationResult, setVerificationResult] = useState<VerificationResult | null>(null);
   const [isVerifying, setIsVerifying] = useState(false);
   const [error, setError] = useState('');
-  const [provider, setProvider] = useState<ethers.BrowserProvider | null>(null);
-  const [contract, setContract] = useState<ethers.Contract | null>(null);
-
-  useEffect(() => {
-    if (window.ethereum) {
-      try {
-        const newProvider = new ethers.BrowserProvider(window.ethereum);
-        setProvider(newProvider);
-        const contractAddress = import.meta.env.VITE_CONTRACT_ADDRESS;
-        if (!contractAddress) {
-          throw new Error("Contract address not found. Check your .env file.");
-        }
-        const mediaVerificationContract = new ethers.Contract(contractAddress, MediaVerificationABI, newProvider);
-        setContract(mediaVerificationContract);
-      } catch (err) {
-        setError("Failed to connect to the blockchain. Please make sure you have a wallet installed and configured.");
-      }
-    } else {
-      setError("Wallet not found. Please install a wallet like MetaMask.");
-    }
-  }, []);
 
   const handleVerify = async () => {
     if (!hashInput.trim()) {
       setError('Please enter a file hash to verify');
-      return;
-    }
-    if (!contract) {
-      setError('Contract not initialized. Please check your wallet connection and refresh the page.');
       return;
     }
 
@@ -57,20 +32,19 @@ export function VerificationModule() {
     setVerificationResult(null);
 
     try {
-      const result = await contract.getMedia(hashInput);
-      if (result.timestamp > 0) {
-        setVerificationResult({
-          fileHash: hashInput,
-          timestamp: new Date(Number(result.timestamp) * 1000).toISOString(),
-          latitude: (Number(result.latitude) / 1e6).toFixed(6),
-          longitude: (Number(result.longitude) / 1e6).toFixed(6),
-          ipfsCID: result.ipfsCID,
-        });
-      } else {
-        setError('No record found for this hash.');
+      const polkadotService = MultiChainPolkadotService.getInstance();
+      if (!polkadotService.isConnected()) {
+        await polkadotService.connectWallet();
       }
-    } catch (err) {
-      setError('An error occurred during verification. Please try again.');
+
+      const result = await polkadotService.verifyFileOnBlockchain(hashInput);
+      if (result) {
+        setVerificationResult(result);
+      } else {
+        setError('No record found for this hash on the Polkadot blockchain.');
+      }
+    } catch (err: any) {
+      setError(`Verification failed: ${err.message}`);
     } finally {
       setIsVerifying(false);
     }
@@ -80,7 +54,7 @@ export function VerificationModule() {
     <Card className="p-8 bg-card border-2 border-border/50 shadow-xl relative overflow-hidden">
       <div className="absolute -top-10 -left-10 w-40 h-40 bg-[#3B82F6]/20 rounded-full blur-2xl"></div>
       <h3 className="text-card-foreground mb-6 font-bold text-2xl uppercase tracking-wide relative z-10">Verify Media</h3>
-      
+
       <div className="space-y-6 relative z-10">
         <div>
           <Label htmlFor="hash-input" className="text-card-foreground/60 font-semibold">File Hash</Label>
@@ -94,7 +68,7 @@ export function VerificationModule() {
             />
             <Button
               onClick={handleVerify}
-              disabled={isVerifying || !contract}
+              disabled={isVerifying}
               className="bg-primary hover:bg-primary/90 text-white px-8 rounded-full font-semibold lowercase shadow-lg shadow-primary/30"
             >
               <Search size={18} className="mr-2" />
@@ -135,7 +109,7 @@ export function VerificationModule() {
                   </div>
                   <Label className="text-card-foreground/60 font-semibold">Timestamp</Label>
                 </div>
-                <p className="text-card-foreground ml-13">{new Date(verificationResult.timestamp).toLocaleString()}</p>
+                <p className="text-card-foreground ml-13">{new Date(parseInt(verificationResult.timestamp)).toLocaleString()}</p>
               </div>
 
               <div className="p-5 bg-card-foreground/5 rounded-2xl border-2 border-border/50">
@@ -145,16 +119,7 @@ export function VerificationModule() {
                   </div>
                   <Label className="text-card-foreground/60 font-semibold">Geolocation</Label>
                 </div>
-                <div className="grid grid-cols-2 gap-3 ml-13">
-                  <div>
-                    <span className="text-card-foreground/60">Lat: </span>
-                    <span className="text-card-foreground font-mono">{verificationResult.latitude}</span>
-                  </div>
-                  <div>
-                    <span className="text-card-foreground/60">Lon: </span>
-                    <span className="text-card-foreground font-mono">{verificationResult.longitude}</span>
-                  </div>
-                </div>
+                <p className="text-card-foreground ml-13">{verificationResult.location}</p>
               </div>
 
               <div className="p-5 bg-card-foreground/5 rounded-2xl border-2 border-border/50">
@@ -162,9 +127,19 @@ export function VerificationModule() {
                   <div className="w-10 h-10 bg-gradient-to-br from-[#3B82F6] to-[#8B5CF6] rounded-xl flex items-center justify-center">
                     <FileText className="text-white" size={18} />
                   </div>
-                  <Label className="text-card-foreground/60 font-semibold">IPFS CID</Label>
+                  <Label className="text-card-foreground/60 font-semibold">File Name</Label>
                 </div>
-                <p className="text-card-foreground font-mono break-all ml-13">{verificationResult.ipfsCID}</p>
+                <p className="text-card-foreground font-mono break-all ml-13">{verificationResult.fileName}</p>
+              </div>
+
+              <div className="p-5 bg-card-foreground/5 rounded-2xl border-2 border-border/50">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-10 h-10 bg-gradient-to-br from-[#8B5CF6] to-[#2DD4BF] rounded-xl flex items-center justify-center">
+                    <Hash className="text-white" size={18} />
+                  </div>
+                  <Label className="text-card-foreground/60 font-semibold">Block Number</Label>
+                </div>
+                <p className="text-card-foreground font-mono break-all ml-13">{verificationResult.blockNumber}</p>
               </div>
             </div>
           </div>

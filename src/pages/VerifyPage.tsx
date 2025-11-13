@@ -1,4 +1,4 @@
-import { VerificationModule } from '../components/VerificationModule';
+import { CertificateVerificationModule } from '../components/CertificateVerificationModule';
 import { Card } from '../components/ui/card';
 import { Shield } from 'lucide-react';
 
@@ -11,21 +11,21 @@ export function VerifyPage() {
       <div className="absolute -bottom-40 -left-32 w-[600px] h-[600px] bg-[#8B5CF6] rounded-[30%_70%_70%_30%/30%_30%_70%_70%] opacity-85"></div>
       <div className="absolute bottom-[10%] right-[10%] w-[450px] h-[450px] bg-[#2DD4BF] rounded-[50%_50%_30%_70%/50%_50%_70%_30%] opacity-85"></div>
       <div className="absolute top-[40%] -left-40 w-[400px] h-[400px] bg-[#FACC15] rounded-[70%_30%_50%_50%/60%_40%_60%_40%] opacity-80"></div>
-      
+
       <div className="container mx-auto px-4 py-12 max-w-4xl relative z-10">
         <div className="text-center mb-10">
           <div className="w-20 h-20 bg-gradient-to-br from-[#8B5CF6] to-[#FB923C] rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-[#8B5CF6]/30">
             <Shield className="text-white" size={40} />
           </div>
-          <h1 className="text-foreground mb-4 text-4xl uppercase font-black tracking-tight">Verify Media</h1>
+          <h1 className="text-foreground mb-4 text-4xl uppercase font-black tracking-tight">Verify Certificate</h1>
           <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
-            Enter a file hash to verify its authenticity and retrieve blockchain metadata including 
-            timestamp, geolocation, and IPFS content identifier.
+            Enter a certificate hash to verify its authenticity on the Polkadot Relay Chain.
+            Retrieve complete certificate metadata, timestamp, and verification details.
           </p>
         </div>
 
         <div className="space-y-6">
-          <VerificationModule />
+          <CertificateVerificationModule />
 
           <Card className="p-8 bg-card border-2 border-[#2DD4BF]/50 shadow-xl relative overflow-hidden">
             <div className="absolute -top-10 -right-10 w-40 h-40 bg-[#FACC15]/20 rounded-full blur-2xl"></div>
@@ -44,7 +44,7 @@ export function VerifyPage() {
                   2
                 </div>
                 <div>
-                  <p>Click "Verify" to query the blockchain for matching records</p>
+                  <p>Click "Verify" to query the Polkadot Relay Chain for matching certificate records</p>
                 </div>
               </div>
               <div className="flex gap-4 items-start">
@@ -52,7 +52,7 @@ export function VerifyPage() {
                   3
                 </div>
                 <div>
-                  <p>View complete metadata including IPFS CID, timestamp, and location data</p>
+                  <p>View complete certificate metadata including issuer, recipient, dates, and blockchain details</p>
                 </div>
               </div>
             </div>
@@ -76,7 +76,7 @@ export function VerifyPage() {
               </li>
               <li className="flex gap-3 items-start">
                 <span className="text-[#3B82F6] text-2xl flex-shrink-0">•</span>
-                <span>Retrieve files from IPFS using verified content identifiers</span>
+                <span>Access permanent, immutable records on the Polkadot Relay Chain</span>
               </li>
             </ul>
           </Card>

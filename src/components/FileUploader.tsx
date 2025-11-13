@@ -3,12 +3,11 @@ import { Card } from './ui/card';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
-import { Upload, ExternalLink, MapPin } from 'lucide-react';
+import { Upload, MapPin } from 'lucide-react';
 
 interface FileData {
   fileName: string;
   fileHash: string;
-  ipfsCID: string;
   latitude: number;
   longitude: number;
   timestamp: string;
@@ -22,7 +21,6 @@ interface FileUploaderProps {
 export function FileUploader({ onFileData, walletConnected }: FileUploaderProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [fileHash, setFileHash] = useState('');
-  const [ipfsCID, setIpfsCID] = useState('');
   const [latitude, setLatitude] = useState<number | null>(null);
   const [longitude, setLongitude] = useState<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -33,15 +31,6 @@ export function FileUploader({ onFileData, walletConnected }: FileUploaderProps)
     const hashArray = Array.from(new Uint8Array(hashBuffer));
     const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
     return hashHex;
-  };
-
-  const generateMockCID = (): string => {
-    // Generate a mock IPFS CID
-    const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    const cid = 'Qm' + Array.from({ length: 44 }, () => 
-      chars[Math.floor(Math.random() * chars.length)]
-    ).join('');
-    return cid;
   };
 
   const getGeolocationAsync = (): Promise<{ latitude: number; longitude: number }> => {
@@ -68,19 +57,16 @@ export function FileUploader({ onFileData, walletConnected }: FileUploaderProps)
     if (file) {
       setSelectedFile(file);
       const hash = await calculateHash(file);
-      const cid = generateMockCID();
       setFileHash(hash);
-      setIpfsCID(cid);
-      
+
       const geo = await getGeolocationAsync(); // Await geolocation
       setLatitude(geo.latitude);
       setLongitude(geo.longitude);
-      
+
       const timestamp = new Date().toISOString();
       onFileData({
         fileName: file.name,
         fileHash: hash,
-        ipfsCID: cid,
         latitude: geo.latitude, // Use awaited geolocation
         longitude: geo.longitude, // Use awaited geolocation
         timestamp,
@@ -92,7 +78,7 @@ export function FileUploader({ onFileData, walletConnected }: FileUploaderProps)
     <Card className="p-8 bg-card border-2 border-border/50 shadow-xl relative overflow-hidden">
       <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-[#2DD4BF]/20 rounded-full blur-2xl"></div>
       <h3 className="text-card-foreground mb-6 font-bold text-2xl uppercase tracking-wide relative z-10">File Selection & Hashing</h3>
-      
+
       <div className="space-y-5 relative z-10">
         <div>
           <Label htmlFor="file-input" className="text-card-foreground/60 font-semibold">Choose File</Label>
@@ -137,24 +123,6 @@ export function FileUploader({ onFileData, walletConnected }: FileUploaderProps)
                 readOnly
                 className="bg-card-foreground/5 font-mono mt-2 border-2 border-border/50 rounded-xl"
               />
-            </div>
-
-            <div>
-              <Label className="text-card-foreground/60 font-semibold">IPFS CID</Label>
-              <div className="flex gap-3 mt-2">
-                <Input
-                  value={ipfsCID}
-                  readOnly
-                  className="bg-card-foreground/5 font-mono flex-1 border-2 border-border/50 rounded-xl"
-                />
-                <Button
-                  onClick={() => window.open(`https://ipfs.io/ipfs/${ipfsCID}`, '_blank')}
-                  title="View on IPFS Gateway"
-                  className="bg-primary hover:bg-primary/90 text-white rounded-full px-4 shadow-lg shadow-primary/30"
-                >
-                  <ExternalLink size={18} />
-                </Button>
-              </div>
             </div>
 
             {latitude !== null && longitude !== null && (

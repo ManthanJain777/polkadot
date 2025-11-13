@@ -26,23 +26,23 @@ export function ChatBot() {
   const knowledgeBase: KnowledgeBase[] = [
     {
       keywords: ['hello', 'hi', 'hey', 'greetings'],
-      response: "Hello! I'm your IPFS File Hasher assistant. I can help you with uploading files, verifying media, connecting your wallet, and understanding how the platform works. What would you like to know?",
+      response: "Hello! I'm your Polkadot File Verifier assistant. I can help you with uploading files, verifying media, connecting your wallet, and understanding how the platform works. What would you like to know?",
     },
     {
       keywords: ['upload', 'file', 'how to upload', 'add file'],
-      response: "To upload a file:\n1. Navigate to the Upload page using the navigation menu\n2. Click 'Connect Wallet' to connect your MetaMask wallet\n3. Click 'Choose File' or 'Select' to pick your file\n4. The system will automatically generate SHA256 hash and IPFS CID\n5. Click 'Upload to IPFS' to store your file\n6. Finally, click 'Submit to Blockchain' to record it permanently",
+      response: "To upload a file:\n1. Navigate to the Upload page using the navigation menu\n2. Click 'Connect Wallet' to connect your Polkadot wallet\n3. Click 'Choose File' or 'Select' to pick your file\n4. The system will automatically generate SHA256 hash and metadata\n5. Click 'Submit to Polkadot Blockchain' to permanently record it",
     },
     {
       keywords: ['verify', 'check', 'verification', 'how to verify'],
-      response: "To verify a file:\n1. Go to the Verify page from the navigation menu\n2. Enter the SHA256 hash of the file you want to verify\n3. Click the 'Verify' button\n4. The system will retrieve and display:\n   - File hash\n   - Timestamp\n   - Geolocation data\n   - IPFS CID\nThis proves the file's authenticity and ownership.",
+      response: "To verify a file:\n1. Go to the Verify page from the navigation menu\n2. Enter the SHA256 hash of the file you want to verify\n3. Click the 'Verify' button\n4. The system will retrieve and display:\n   - File hash\n   - Timestamp\n   - Geolocation data\n   - File name\nThis proves the file's authenticity and ownership.",
     },
     {
       keywords: ['wallet', 'metamask', 'connect wallet', 'connection'],
       response: "To connect your wallet:\n1. Make sure you have MetaMask installed in your browser\n2. Go to the Upload page\n3. Click the 'Connect Wallet' button in the MetaMask Connection card\n4. Your wallet address will be displayed once connected\n5. You can now upload files and submit to blockchain\n\nNote: In this demo, wallet connection is simulated.",
     },
     {
-      keywords: ['ipfs', 'what is ipfs', 'storage'],
-      response: "IPFS (InterPlanetary File System) is a distributed, peer-to-peer protocol for storing and sharing data. Benefits:\n\n• Decentralized storage - no single point of failure\n• Content addressing - files are identified by their content, not location\n• Permanent storage - files can't be deleted once added\n• Fast retrieval - files are served from the nearest peer\n\nYour files are stored permanently on the IPFS network with a unique CID.",
+      keywords: ['polkadot', 'what is polkadot', 'blockchain'],
+      response: "Polkadot is a multi-chain network that enables different blockchains to transfer messages and value in a trust-free fashion. Benefits:\n\n• Interoperability - different blockchains can communicate seamlessly\n• Security - shared security model across connected chains\n• Scalability - multiple chains processing transactions in parallel\n• Governance - on-chain governance for network upgrades\n\nYour file hashes are permanently recorded on the Polkadot blockchain network.",
     },
     {
       keywords: ['hash', 'sha256', 'what is hash'],
@@ -58,11 +58,11 @@ export function ChatBot() {
     },
     {
       keywords: ['cost', 'price', 'fee', 'payment'],
-      response: "This is a demonstration platform. In production:\n\n• Blockchain transactions require gas fees (cryptocurrency)\n• IPFS storage may require pinning services (subscription)\n• MetaMask wallet is free to use\n• Transaction costs vary by network congestion\n\nFor this demo, all operations are simulated and free.",
+      response: "This is a demonstration platform. In production:\n\n• Polkadot blockchain transactions require fees (DOT tokens)\n• Polkadot.js wallet is free to use\n• Transaction costs vary by network congestion\n\nFor this demo, all operations are simulated and free.",
     },
     {
       keywords: ['safe', 'secure', 'security', 'privacy'],
-      response: "Security features:\n\n• Files are hashed locally in your browser\n• Private keys never leave your wallet\n• Blockchain provides tamper-proof records\n• IPFS uses content addressing for integrity\n• No central server stores your credentials\n\nImportant: This is a demo. Don't upload sensitive or personal information.",
+      response: "Security features:\n\n• Files are hashed locally in your browser\n• Private keys never leave your wallet\n• Polkadot blockchain provides tamper-proof records\n• SHA256 hashing ensures content integrity\n• No central server stores your credentials\n\nImportant: This is a demo. Don't upload sensitive or personal information.",
     },
     {
       keywords: ['error', 'problem', 'issue', 'not working', 'help'],
@@ -77,8 +77,8 @@ export function ChatBot() {
       response: "You can navigate using the menu at the top:\n\n• Home - Overview and features\n• Upload - Upload and hash files\n• Verify - Verify file authenticity\n• About - Learn about the technology\n\nJust click on any menu item to go to that page!",
     },
     {
-      keywords: ['cid', 'content identifier', 'ipfs cid'],
-      response: "IPFS CID (Content Identifier) is a unique address for your file on IPFS. Format: Qm... followed by 44 characters.\n\n• Generated from your file's content\n• Same file = same CID always\n• Used to retrieve your file from any IPFS node\n• Click the link icon to view on IPFS gateway\n• Stored on blockchain with your hash",
+      keywords: ['cid', 'content identifier', 'hash'],
+      response: "File hash is a unique identifier for your file. Format: A 64-character hexadecimal string.\n\n• Generated using SHA256 algorithm from your file's content\n• Same file = same hash always\n• Used to verify your file's authenticity\n• Stored permanently on the Polkadot blockchain\n• Provides tamper-proof proof of existence",
     },
     {
       keywords: ['timestamp', 'time', 'date', 'when'],
@@ -91,7 +91,7 @@ export function ChatBot() {
     if (isOpen && messages.length === 0) {
       setMessages([{
         id: Date.now().toString(),
-        text: "Welcome! I'm your IPFS File Hasher assistant. How can I help you today? You can ask me about uploading files, verifying media, connecting wallets, or general platform guidance.",
+        text: "Welcome! I'm your Polkadot File Verifier assistant. How can I help you today? You can ask me about uploading files, verifying media, connecting wallets, or general platform guidance.",
         isBot: true,
         timestamp: new Date(),
       }]);
@@ -109,7 +109,7 @@ export function ChatBot() {
     }
     
     // Default response if no match found
-    return "I'm not sure about that. I can help you with:\n\n• Uploading files to IPFS\n• Verifying file authenticity\n• Connecting your wallet\n• Understanding blockchain and IPFS\n• Platform navigation\n\nWhat would you like to know more about?";
+    return "I'm not sure about that. I can help you with:\n\n• Uploading files to Polkadot blockchain\n• Verifying file authenticity\n• Connecting your wallet\n• Understanding Polkadot blockchain\n• Platform navigation\n\nWhat would you like to know more about?";
   };
 
   const handleSendMessage = () => {
@@ -172,7 +172,7 @@ export function ChatBot() {
                 <MessageCircle size={22} />
               </div>
               <div>
-                <h3 className="font-bold text-lg uppercase tracking-wide">IPFS Assistant</h3>
+                <h3 className="font-bold text-lg uppercase tracking-wide">Polkadot Assistant</h3>
                 <p className="text-white/90 text-xs font-semibold">
                   Online - Here to help
                 </p>
