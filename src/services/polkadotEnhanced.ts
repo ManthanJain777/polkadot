@@ -258,33 +258,98 @@ export class PolkadotVerificationService {
           providerUrl = 'wss://statemint-rpc.dwellir.com';
           break;
         case 'paseo':
-          providerUrl = 'wss://api-paseo.n.dwellir.com/1350b635-a82e-4e02-b336-7de9dba9108f';
+          providerUrl = 'wss://rpc.ibp.network/paseo'; // Fixed: Removed invalid UUID path, using public RPC endpoint
           break;
         default:
           providerUrl = 'wss://acala-rpc.dwellir.com';
       }
 
       if (this.api) {
-        await this.api.disconnect();
+        try {
+          await this.api.disconnect();
+        } catch (e) {
+          // Ignore disconnect errors
+        }
+        this.api = null;
       }
 
-      const provider = new WsProvider(providerUrl);
-      this.api = await ApiPromise.create({ provider });
+      // Get fallback endpoints
+      const endpoints = this.getEndpointsWithFallback(providerUrl);
+      
+      let lastError: Error | null = null;
+      for (const endpoint of endpoints) {
+        try {
+          console.log(`🔄 Attempting to connect to ${network} via: ${endpoint}`);
+          
+          const provider = new WsProvider(endpoint, 3000); // 3 second connection timeout
+          
+          this.api = await Promise.race([
+            ApiPromise.create({ provider, throwOnConnect: false }),
+            new Promise<never>((_, reject) => 
+              setTimeout(() => reject(new Error('Connection timeout')), 10000)
+            )
+          ]);
 
-      // Reinitialize accounts with the new connection
-      const extensions = await web3Enable('ZeroTrace-Polkadot-Verification');
-      if (extensions.length > 0) {
-        this.accounts = await web3Accounts();
-        if (this.accounts.length > 0 && !this.selectedAccount) {
-          this.selectedAccount = this.accounts[0];
+          // Wait for the API to be ready with timeout
+          await Promise.race([
+            this.api.isReady,
+            new Promise<never>((_, reject) => 
+              setTimeout(() => reject(new Error('API ready timeout')), 10000)
+            )
+          ]);
+
+          // Reinitialize accounts with the new connection
+          const extensions = await web3Enable('ZeroTrace-Polkadot-Verification');
+          if (extensions.length > 0) {
+            this.accounts = await web3Accounts();
+            if (this.accounts.length > 0 && !this.selectedAccount) {
+              this.selectedAccount = this.accounts[0];
+            }
+          }
+
+          console.log(`✅ Connected to ${network} network via ${endpoint}`);
+          return true;
+        } catch (error) {
+          console.warn(`⚠️ Connection failed to ${endpoint}:`, error);
+          lastError = error as Error;
+          
+          if (this.api) {
+            try {
+              await this.api.disconnect();
+            } catch (e) {
+              // Ignore disconnect errors
+            }
+            this.api = null;
+          }
+          continue;
         }
       }
 
-      console.log(`✅ Connected to ${network} network`);
-      return true;
+      throw lastError || new Error('All connection attempts failed');
     } catch (error) {
       console.error(`❌ Failed to connect to ${network} network:`, error);
       return false;
     }
+  }
+
+  private getEndpointsWithFallback(primaryEndpoint: string): string[] {
+    const fallbacks: Record<string, string[]> = {
+      'wss://rpc.ibp.network/paseo': [
+        'wss://rpc.ibp.network/paseo',
+        'wss://paseo-rpc.dwellir.com',
+        'wss://paseo-rpc.polkadot.io'
+      ],
+      'wss://polkadot-rpc.dwellir.com': [
+        'wss://polkadot-rpc.dwellir.com',
+        'wss://rpc.polkadot.io',
+        'wss://polkadot.api.onfinality.io/public-ws'
+      ],
+      'wss://kusama-rpc.dwellir.com': [
+        'wss://kusama-rpc.dwellir.com',
+        'wss://kusama-rpc.polkadot.io',
+        'wss://kusama.api.onfinality.io/public-ws'
+      ]
+    };
+    return fallbacks[primaryEndpoint] || [primaryEndpoint];
   }
 }
